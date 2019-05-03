@@ -10,6 +10,10 @@ local RENDER_SCALE = 3
 local pointerCol
 local pointerRow
 local dialogIndex
+local animationFrames
+local hitChanceSprite
+local dynamicHitChance
+local isHit
 
 local drawSprite = function(spriteSheetImage, sx, sy, sw, sh, x, y, flipHorizontal, flipVertical, rotation)
   local width, height = spriteSheetImage:getDimensions()
@@ -27,13 +31,28 @@ function game.preload()
   spriteSheet:setFilter('nearest', 'nearest')
 end
 
-function game.load()
+function game.load(args)
   pointerCol = 0
   pointerRow = 0
   dialogIndex = 0
+  animationFrames = 0
+  hitChanceSprite = 0
+  dynamicHitChance = args and args.dynamicHitChance
+  isHit = false
 end
 
 function game.update(dt)
+  animationFrames = animationFrames + 1
+  if dialogIndex == 2 and animationFrames > 160 then
+    dialogIndex = 0
+    if dynamicHitChance then
+      if isHit then
+        hitChanceSprite = 0
+      else
+        hitChanceSprite = math.min(hitChanceSprite + 1, 2)
+      end
+    end
+  end
 end
 
 function game.draw()
@@ -53,10 +72,55 @@ function game.draw()
   end
 
   -- Draw the mailperson
-  drawSprite(spriteSheet, 1, 127, 49, 40, 41, 51)
+  local mailPersonSprite = 0
+  if dialogIndex == 2 then
+    if animationFrames < 35 then
+      mailPersonSprite = 1
+    elseif animationFrames < 39 then
+      mailPersonSprite = 2
+    elseif animationFrames < 45 then
+      mailPersonSprite = 3
+    elseif animationFrames < 51 then
+      mailPersonSprite = 4
+    elseif animationFrames < 140 then
+      mailPersonSprite = 5
+    end
+  end
+  drawSprite(spriteSheet, 50 * mailPersonSprite + 1, 127, 49, 40, 41, 51)
 
   -- Draw the mailbox
-  drawSprite(spriteSheet, 194, 89, 40, 35, 111, 57)
+  local mailboxSprite
+  if not isHit and dialogIndex == 2 and 39 <= animationFrames and animationFrames < 85 then
+    mailboxSprite = 1
+  else
+    mailboxSprite = 0
+  end
+  drawSprite(spriteSheet, 194 + 41 * mailboxSprite, 89, 40, 35, 111, 57)
+
+  -- Draw mail
+  if dialogIndex == 2 and 44 <= animationFrames and animationFrames < 51 then
+    drawSprite(spriteSheet, 285, 71, 29, 5, 95, 63)
+  elseif not isHit and dialogIndex == 2 and 51 <= animationFrames and animationFrames < 58 then
+    drawSprite(spriteSheet, 285, 71, 29, 5, 120, 63)
+  end
+
+  -- Draw miss
+  if not isHit then
+    if dialogIndex == 2 and animationFrames >= 39 then
+      local missSprite
+      if animationFrames < 43 then
+        missSprite = 0
+      elseif animationFrames < 47 then
+        missSprite = 1
+      else
+        missSprite = 2
+      end
+      drawSprite(spriteSheet, 285, 1 + 12 * missSprite, 42, 11, 111, 47)
+    end
+  end
+
+  -- Draw the hit chance
+  drawSprite(spriteSheet, 285 + 41 * hitChanceSprite, 39, 40, 29, 77, 10)
 end
 
 function game.keypressed(key)
@@ -64,14 +128,12 @@ function game.keypressed(key)
     pointerRow = 1 - pointerRow
   elseif key == 'left' or key == 'right' then
     pointerCol = 1 - pointerCol
-  elseif key == 'z' then
-    if dialogIndex == 2 then
-      dialogIndex = 0
-    else
-      dialogIndex = dialogIndex + 1
-    end
+  elseif (key == 'z' or key == 'h') and dialogIndex ~= 2 then
+    isHit = (key == 'h')
+    dialogIndex = dialogIndex + 1
     pointerCol = 0
     pointerRow = 0
+    animationFrames = 0
   end
 end
 

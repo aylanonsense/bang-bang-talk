@@ -2,7 +2,7 @@ local badMathGame = require 'src/games/bad-math/game'
 -- local inputLatencyGame = require 'src/games/input-latency/game'
 
 local games = {
-  { game = badMathGame }
+  { game = badMathGame, args = { dynamicHitChance = true } }
   -- { game = inputLatencyGame }
 }
 
