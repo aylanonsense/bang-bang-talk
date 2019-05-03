@@ -4,25 +4,21 @@ local tableUtils = require 'src/utils/table'
 
 -- Render constants
 local GAME_WIDTH = 192
-local GAME_HEIGHT = 192
-local RENDER_SCALE = 3
+local GAME_HEIGHT = 125
+local RENDER_SCALE = 4
 
 -- Game constants
 local LEVEL_NUM_COLUMNS = 12
-local LEVEL_NUM_ROWS = 12
+local LEVEL_NUM_ROWS = 8
 local LEVEL_DATA = [[
 ............
 ............
-......ooooo.
-X....XXXXXXX
-XX..........
-.XX.......o.
-..XXXXX...o.
-..........o.
-X........XXX
-X....oo.....
-X.P..XXX....
-XXXXXX......
+............
+............
+...........o
+X..........X
+X.P...oooo.X
+XXXXXXXXXXXX
 ]]
 
 -- Game variables
@@ -42,12 +38,11 @@ local history
 -- Assets
 local playerImage
 local objectsImage
+local uiImage
 local walkSounds
 local jumpSound
 local landSound
 local gemSound
-
-
 
 -- Draws a sprite from a sprite sheet, spriteNum=1 is the upper-leftmost sprite
 local drawSprite = function(spriteSheetImage, spriteWidth, spriteHeight, sprite, x, y, flipHorizontal, flipVertical, rotation)
@@ -60,6 +55,16 @@ local drawSprite = function(spriteSheetImage, spriteWidth, spriteHeight, sprite,
     rotation or 0,
     flipHorizontal and -1 or 1, flipVertical and -1 or 1,
     spriteWidth / 2, spriteHeight / 2)
+end
+
+local drawSprite2 = function(spriteSheetImage, sx, sy, sw, sh, x, y, flipHorizontal, flipVertical, rotation)
+  local width, height = spriteSheetImage:getDimensions()
+  love.graphics.draw(spriteSheetImage,
+    love.graphics.newQuad(sx, sy, sw, sh, width, height),
+    x + sw / 2, y + sh / 2,
+    rotation or 0,
+    flipHorizontal and -1 or 1, flipVertical and -1 or 1,
+    sw / 2, sh / 2)
 end
 
 -- Determine whether two rectangles are overlapping
@@ -90,12 +95,14 @@ end
 -- Gets the current state of the application
 local getState = function()
   return tableUtils.cloneTable({
-    player = player
+    player = player,
+    gems = gems
   })
 end
 
 local applyState = function(state)
   player = tableUtils.cloneTable(state.player)
+  gems = tableUtils.cloneTable(state.gems)
 end
 
 local getInputs = function(ignoreInstantInputs)
@@ -110,8 +117,10 @@ function game.preload()
   -- Load assets
   playerImage = love.graphics.newImage('src/games/input-latency/img/player.png')
   objectsImage = love.graphics.newImage('src/games/input-latency/img/objects.png')
+  uiImage = love.graphics.newImage('src/games/input-latency/img/ui.png')
   playerImage:setFilter('nearest', 'nearest')
   objectsImage:setFilter('nearest', 'nearest')
+  uiImage:setFilter('nearest', 'nearest')
   walkSounds = {
     love.audio.newSource('src/games/input-latency/sfx/walk1.wav', 'static'),
     love.audio.newSource('src/games/input-latency/sfx/walk2.wav', 'static')
@@ -128,7 +137,7 @@ function game.load(args)
   gems = {}
   for col = 1, LEVEL_NUM_COLUMNS do
     for row = 1, LEVEL_NUM_ROWS do
-      local i = (LEVEL_NUM_ROWS + 1) * (row - 1) + col
+      local i = (LEVEL_NUM_COLUMNS + 1) * (row - 1) + col
       local x, y = 16 * (col - 1), 16 * (row - 1)
       local symbol = string.sub(LEVEL_DATA, i, i)
       if symbol == 'P' then
@@ -310,15 +319,31 @@ function game.draw()
   love.graphics.clear(251 / 255, 134 / 255, 199 / 255)
   love.graphics.setColor(1, 1, 1, 1)
 
+  -- Draw input latency
+  drawSprite2(uiImage, 1, 1, 108, 10, 46, 8)
+  local latencyText = '' .. math.abs(inputLatency)
+  for i = 1, #latencyText do
+    local c = string.sub(latencyText, i, i)
+    drawSprite2(uiImage, 6 + 6 * tonumber(c), 14, 5, 8, 137 + 6 * i - 3 * #latencyText, 5)
+  end
+  if inputLatency < 0 then
+    drawSprite2(uiImage, 1, 17, 4, 2, 132, 8)
+  end
+
+  -- Draw inputs
+  drawSprite2(uiImage, love.keyboard.isDown('left') and 29 or 1, 23, 13, 14, 82, 29)
+  drawSprite2(uiImage, love.keyboard.isDown('right') and 43 or 15, 23, 13, 14, 96, 29)
+  drawSprite2(uiImage, love.keyboard.isDown('space') and 29 or 1, 38, 27, 13, 82, 44)
+
   -- Draw  the platforms
   for _, platform in ipairs(platforms) do
-    drawSprite(objectsImage, 16, 16, 1, platform.x, platform.y)
+    drawSprite(objectsImage, 16, 16, 1, platform.x, platform.y + 3)
   end
 
   -- Draw the gems
   for _, gem in ipairs(gems) do
     if not gem.isCollected then
-      drawSprite(objectsImage, 16, 16, 2, gem.x, gem.y)
+      drawSprite(objectsImage, 16, 16, 2, gem.x, gem.y + 3)
     end
   end
 
@@ -348,7 +373,16 @@ function game.draw()
   else
     sprite = 5
   end
-  drawSprite(playerImage, 16, 16, sprite, player.x, player.y, player.isFacingLeft)
+  drawSprite(playerImage, 16, 16, sprite, player.x, player.y + 3, player.isFacingLeft)
+end
+
+function game.keypressed(key)
+  local amt = love.keyboard.isDown('lshift') and 5 or 1
+  if key == 'up' then
+    inputLatency = math.min(inputLatency + amt, 60)
+  elseif key == 'down' then
+    inputLatency = math.max(-60, inputLatency - amt)
+  end
 end
 
 return game

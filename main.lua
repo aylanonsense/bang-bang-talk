@@ -1,9 +1,9 @@
 local badMathGame = require 'src/games/bad-math/game'
--- local inputLatencyGame = require 'src/games/input-latency/game'
+local inputLatencyGame = require 'src/games/input-latency/game'
 
 local games = {
-  { game = badMathGame, args = { dynamicHitChance = true } }
-  -- { game = inputLatencyGame }
+  { game = badMathGame, args = { dynamicHitChance = true } },
+  { game = inputLatencyGame }
 }
 
 local currGameIndex
@@ -14,13 +14,6 @@ function switchToGame(index)
   currGameIndex = index
   game = games[currGameIndex].game
   local args = games[currGameIndex].args
-  -- Preload the game
-  if not games[currGameIndex].hasBeenPreloaded then
-    games[currGameIndex].hasBeenPreloaded = true
-    if game.preload then
-      game.preload()
-    end
-  end
   -- Load the game
   if game.load then
     game.load(args)
@@ -28,6 +21,12 @@ function switchToGame(index)
 end
 
 function love.load()
+  -- Preload all games
+  for _, game in ipairs(games) do
+    if game.game.preload then
+      game.game.preload()
+    end
+  end
   -- Switch to our first game
   switchToGame(1)
 end
@@ -46,8 +45,14 @@ function love.draw(...)
   end
 end
 
-function love.keypressed(...)
-  if game.keypressed then
-    game.keypressed(...)
+function love.keypressed(key, ...)
+  if key == 'j' then
+    switchToGame(math.max(1, currGameIndex - 1))
+  elseif key == 'k' then
+    switchToGame(math.min(currGameIndex + 1, #games))
+  elseif key == 'r' then
+    switchToGame(currGameIndex)
+  elseif game.keypressed then
+    game.keypressed(key, ...)
   end
 end

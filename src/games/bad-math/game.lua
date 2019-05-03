@@ -5,7 +5,7 @@ local spriteSheet
 -- Render constants
 local GAME_WIDTH = 192
 local GAME_HEIGHT = 125
-local RENDER_SCALE = 3
+local RENDER_SCALE = 4
 
 local pointerCol
 local pointerRow
