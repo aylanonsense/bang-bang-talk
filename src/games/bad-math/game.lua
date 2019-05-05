@@ -128,7 +128,7 @@ function game.keypressed(key)
     pointerRow = 1 - pointerRow
   elseif key == 'left' or key == 'right' then
     pointerCol = 1 - pointerCol
-  elseif (key == 'z' or key == 'h') and dialogIndex ~= 2 then
+  elseif (key == 'space' or key == 'h') and dialogIndex ~= 2 then
     isHit = (key == 'h')
     dialogIndex = dialogIndex + 1
     pointerCol = 0

@@ -191,35 +191,8 @@ function game.load(args)
   end
 end
 
-function game.update(dt)
-  -- Move history along
-  for i = 1, 121 do
-    history[i] = history[i + 1]
-  end
-  history[122] = {}
-
-  -- Record the player's inputs with input latency taken into acount
-  history[62 + inputLatency].inputs = getInputs()
-  for i = 63 + inputLatency, 62 do
-    history[i].inputs = getInputs(true)
-  end
-
-  -- Regenerate all the state history, including the current frame
-  history[62].dt = dt
-  applyState(history[1].state)
-  for i = 2, 62 do
-    local allowSounds = i == 62
-    local allowJumpSound = not history[i].playedJumpSound
-    local playedJumpSound = updateGame(history[i].dt, history[i].inputs or {}, allowSounds, allowJumpSound)
-    if allowJumpSound and playedJumpSound then
-      history[i].playedJumpSound = true
-    end
-    history[i].state = getState()
-  end
-end
-
 -- Updates the game state
-function updateGame(dt, inputs, allowSounds, allowJumpSound)
+local updateGame = function(dt, inputs, allowSounds, allowJumpSound)
   local playedJumpSound = false
 
   player.landingTimer = math.max(0, player.landingTimer - dt)
@@ -311,6 +284,33 @@ function updateGame(dt, inputs, allowSounds, allowJumpSound)
   return playedJumpSound
 end
 
+function game.update(dt)
+  -- Move history along
+  for i = 1, 121 do
+    history[i] = history[i + 1]
+  end
+  history[122] = {}
+
+  -- Record the player's inputs with input latency taken into acount
+  history[62 + inputLatency].inputs = getInputs()
+  for i = 63 + inputLatency, 62 do
+    history[i].inputs = getInputs(true)
+  end
+
+  -- Regenerate all the state history, including the current frame
+  history[62].dt = dt
+  applyState(history[1].state)
+  for i = 2, 62 do
+    local allowSounds = i == 62
+    local allowJumpSound = not history[i].playedJumpSound
+    local playedJumpSound = updateGame(history[i].dt, history[i].inputs or {}, allowSounds, allowJumpSound)
+    if allowJumpSound and playedJumpSound then
+      history[i].playedJumpSound = true
+    end
+    history[i].state = getState()
+  end
+end
+
 -- Renders the game
 function game.draw()
   -- Scale and crop the screen
@@ -377,7 +377,7 @@ function game.draw()
 end
 
 function game.keypressed(key)
-  local amt = love.keyboard.isDown('lshift') and 5 or 1
+  local amt = (love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift')) and 5 or 1
   if key == 'up' then
     inputLatency = math.min(inputLatency + amt, 60)
   elseif key == 'down' then

@@ -3,7 +3,8 @@ local badMathGame = require 'src/games/bad-math/game'
 local inputLatencyGame = require 'src/games/input-latency/game'
 
 local games = {
-  { game = juiceGame },
+  { game = juiceGame, args = { enableJuice = false } },
+  { game = juiceGame, args = { enableJuice = true } },
   { game = badMathGame, args = { dynamicHitChance = false } },
   { game = inputLatencyGame }
 }
