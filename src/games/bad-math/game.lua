@@ -14,6 +14,8 @@ local animationFrames
 local hitChanceSprite
 local dynamicHitChance
 local isHit
+local hasDeliveredMail
+local isLoveLetter
 
 local drawSprite = function(spriteSheetImage, sx, sy, sw, sh, x, y, flipHorizontal, flipVertical, rotation)
   local width, height = spriteSheetImage:getDimensions()
@@ -39,11 +41,16 @@ function game.load(args)
   hitChanceSprite = 0
   dynamicHitChance = args and args.dynamicHitChance
   isHit = false
+  hasDeliveredMail = false
+  isLoveLetter = false
 end
 
 function game.update(dt)
   animationFrames = animationFrames + 1
-  if dialogIndex == 2 and animationFrames > 160 then
+  if isHit and dialogIndex == 2 and animationFrames == 46 then
+    hasDeliveredMail = true
+  end
+  if dialogIndex == 2 and animationFrames > 125 then
     dialogIndex = 0
     if dynamicHitChance then
       if isHit then
@@ -82,20 +89,33 @@ function game.draw()
       mailPersonSprite = 3
     elseif animationFrames < 51 then
       mailPersonSprite = 4
-    elseif animationFrames < 140 then
+    elseif animationFrames < 125 then
       mailPersonSprite = 5
     end
   end
   drawSprite(spriteSheet, 50 * mailPersonSprite + 1, 127, 49, 40, 41, 51)
+  if isLoveLetter and mailPersonSprite == 1 then
+    drawSprite(spriteSheet, 334, 19, 7, 6, 40, 49)
+  end
+
+  -- Draw the hit effect
+  if isHit and dialogIndex == 2 and 46 <= animationFrames and animationFrames < 70 then
+    drawSprite(spriteSheet, 352, 1, 37, 35, 113, 47)
+  end
 
   -- Draw the mailbox
   local mailboxSprite
-  if not isHit and dialogIndex == 2 and 39 <= animationFrames and animationFrames < 90 then
+  if not isHit and dialogIndex == 2 and 39 <= animationFrames and animationFrames < 70 then
     mailboxSprite = 1
   else
-    mailboxSprite = 0
+    mailboxSprite = hasDeliveredMail and 2 or 0
   end
   drawSprite(spriteSheet, 194 + 41 * mailboxSprite, 89, 40, 35, 111, 57)
+
+  -- Draw heart
+  if hasDeliveredMail then
+    drawSprite(spriteSheet, 334, 19, 7, 6, 129, 52)
+  end
 
   -- Draw mail
   if dialogIndex == 2 and 44 <= animationFrames and animationFrames < 51 then
@@ -131,6 +151,7 @@ function game.keypressed(key)
   elseif (key == 'space' or key == 'h') and dialogIndex ~= 2 then
     isHit = (key == 'h')
     dialogIndex = dialogIndex + 1
+    isLoveLetter = (pointerRow == 1)
     pointerCol = 0
     pointerRow = 0
     animationFrames = 0

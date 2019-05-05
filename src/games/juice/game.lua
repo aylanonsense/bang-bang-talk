@@ -84,7 +84,7 @@ function game.load(args)
   useParticles = args and args.enableJuice
   useHitEffects = args and args.enableJuice
   useCrunchySounds = args and args.enableJuice
-  moreMoreMore = args and args.enableJuice
+  moreMoreMore = false
 end
 
 function game.update(dt)
@@ -169,35 +169,35 @@ function game.draw()
 
   if isInMenu then
     -- Draw the highlight
-    drawSprite(uiImage, 55, 82, 87, 17, 12 + 88 * pointerCol, 32 + 23 * pointerRow)
+    drawSprite(uiImage, 55, 82, 87, 17, 12 + 88 * pointerCol, 19 + 23 * pointerRow)
 
     -- Draw the menu
-    drawSprite(uiImage, 1, 1, 162, 80, 15, 36)
+    drawSprite(uiImage, 1, 1, 162, 80, 15, 23)
 
     -- Draw checkboxes
     if useScreenShake then
-      drawSprite(uiImage, 41, 82, 13, 10, 14, 33)
+      drawSprite(uiImage, 41, 82, 13, 10, 14, 20)
     end
     if useFreezeFrames then
-      drawSprite(uiImage, 41, 82, 13, 10, 14, 56)
+      drawSprite(uiImage, 41, 82, 13, 10, 14, 43)
     end
     if useElasticAnimations then
-      drawSprite(uiImage, 41, 82, 13, 10, 14, 79)
+      drawSprite(uiImage, 41, 82, 13, 10, 14, 66)
     end
     if useCrunchySounds then
-      drawSprite(uiImage, 41, 82, 13, 10, 14, 102)
+      drawSprite(uiImage, 41, 82, 13, 10, 14, 89)
     end
     if useParticles then
-      drawSprite(uiImage, 41, 82, 13, 10, 102, 33)
+      drawSprite(uiImage, 41, 82, 13, 10, 102, 20)
     end
     if useHitEffects then
-      drawSprite(uiImage, 41, 82, 13, 10, 102, 56)
+      drawSprite(uiImage, 41, 82, 13, 10, 102, 43)
     end
     if useFastBall then
-      drawSprite(uiImage, 41, 82, 13, 10, 102, 79)
+      drawSprite(uiImage, 41, 82, 13, 10, 102, 66)
     end
     if moreMoreMore then
-      drawSprite(uiImage, 41, 82, 13, 10, 102, 102)
+      drawSprite(uiImage, 41, 82, 13, 10, 102, 89)
     end
   else
     -- Draw the grass

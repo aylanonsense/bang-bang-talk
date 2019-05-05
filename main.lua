@@ -1,12 +1,29 @@
+local slides = require 'src/games/slides/game'
 local juiceGame = require 'src/games/juice/game'
 local badMathGame = require 'src/games/bad-math/game'
 local inputLatencyGame = require 'src/games/input-latency/game'
 
 local games = {
+  { game = slides, args = { slides = { 0 } } },
+
+  { game = slides, args = { slides = { 1 } } },
   { game = juiceGame, args = { enableJuice = false } },
   { game = juiceGame, args = { enableJuice = true } },
+  { game = slides, args = { slides = { 5, 6 } } },
+
+  { game = slides, args = { slides = { 2 } } },
   { game = badMathGame, args = { dynamicHitChance = false } },
-  { game = inputLatencyGame }
+  { game = slides, args = { slides = { 10, 11, 12 } } },
+  { game = badMathGame, args = { dynamicHitChance = true } },
+  { game = slides, args = { slides = { 6, 7 } } },
+
+  { game = slides, args = { slides = { 3 } } },
+  { game = inputLatencyGame },
+  { game = slides, args = { slides = { 15, 16, 17, 18, 20, 21, 22, 25, 26, 27 } } },
+  { game = inputLatencyGame },
+  { game = slides, args = { slides = { 7, 8, 9 } } },
+
+  { game = slides, args = { slides = { 4 } } }
 }
 
 local currGameIndex
