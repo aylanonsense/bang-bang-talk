@@ -90,7 +90,7 @@ function game.draw()
 
   -- Draw the mailbox
   local mailboxSprite
-  if not isHit and dialogIndex == 2 and 39 <= animationFrames and animationFrames < 85 then
+  if not isHit and dialogIndex == 2 and 39 <= animationFrames and animationFrames < 90 then
     mailboxSprite = 1
   else
     mailboxSprite = 0
@@ -106,11 +106,11 @@ function game.draw()
 
   -- Draw miss
   if not isHit then
-    if dialogIndex == 2 and animationFrames >= 39 then
+    if dialogIndex == 2 and animationFrames >= 59 then
       local missSprite
-      if animationFrames < 43 then
+      if animationFrames < 63 then
         missSprite = 0
-      elseif animationFrames < 47 then
+      elseif animationFrames < 67 then
         missSprite = 1
       else
         missSprite = 2
