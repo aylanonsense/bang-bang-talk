@@ -43,10 +43,12 @@ function game.draw()
 end
 
 function game.keypressed(key)
-  if key == 'left' then
-    currSlideIndex = math.max(1, currSlideIndex - 1)
-  elseif key == 'right' then
-    currSlideIndex = math.min(currSlideIndex + 1, #slides)
+  if key == 'j' and currSlideIndex > 1 then
+    currSlideIndex = currSlideIndex - 1
+    return true
+  elseif key == 'k' and currSlideIndex < #slides then
+    currSlideIndex = currSlideIndex + 1
+    return true
   end
 end
 

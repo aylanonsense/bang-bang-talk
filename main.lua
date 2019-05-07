@@ -66,13 +66,13 @@ function love.draw(...)
 end
 
 function love.keypressed(key, ...)
-  if key == 'j' then
-    switchToGame(math.max(1, currGameIndex - 1))
-  elseif key == 'k' then
-    switchToGame(math.min(currGameIndex + 1, #games))
-  elseif key == 'r' then
-    switchToGame(currGameIndex)
-  elseif game.keypressed then
-    game.keypressed(key, ...)
+  if not game.keypressed or not game.keypressed(key, ...) then
+    if key == 'j' then
+      switchToGame(math.max(1, currGameIndex - 1))
+    elseif key == 'k' then
+      switchToGame(math.min(currGameIndex + 1, #games))
+    elseif key == 'r' then
+      switchToGame(currGameIndex)
+    end
   end
 end
