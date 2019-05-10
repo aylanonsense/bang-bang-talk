@@ -3,7 +3,7 @@ local game = {}
 -- Render constants
 local GAME_WIDTH = 192
 local GAME_HEIGHT = 125
-local RENDER_SCALE = 4
+local RENDER_SCALE = 2
 
 local isInMenu
 local isHit
@@ -161,9 +161,9 @@ function game.draw()
   end
 
   -- Scale and crop the screen
-  love.graphics.setScissor(0, 0, RENDER_SCALE * GAME_WIDTH, RENDER_SCALE * GAME_HEIGHT)
   love.graphics.scale(RENDER_SCALE, RENDER_SCALE)
-  love.graphics.clear(isInMenu and { 37 / 255, 2 / 255, 72 / 255 } or { 169 / 255, 232 / 255, 85 / 255 })
+  love.graphics.setColor(isInMenu and { 37 / 255, 2 / 255, 72 / 255 } or { 169 / 255, 232 / 255, 85 / 255 })
+  love.graphics.rectangle('fill', 0, 0, GAME_WIDTH, GAME_HEIGHT)
   love.graphics.setColor(1, 1, 1)
   love.graphics.translate((moreMoreMore and 2 or 1) * screenShakeX, 0)
 

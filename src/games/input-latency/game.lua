@@ -5,7 +5,7 @@ local tableUtils = require 'src/utils/table'
 -- Render constants
 local GAME_WIDTH = 192
 local GAME_HEIGHT = 125
-local RENDER_SCALE = 4
+local RENDER_SCALE = 2
 
 -- Game constants
 local LEVEL_NUM_COLUMNS = 12
@@ -25,6 +25,7 @@ XXXXXXXXXXXX
 local player
 local platforms
 local gems
+local currKeyPresses
 
 -- The number of frames of input latency
 local inputLatency
@@ -107,9 +108,9 @@ end
 
 local getInputs = function(ignoreInstantInputs)
   return {
-    left = love.keyboard.isDown('left'),
-    right = love.keyboard.isDown('right'),
-    jump = not ignoreInstantInputs and love.keyboard.isDown('space')
+    left = currKeyPresses.left, -- love.keyboard.isDown('left'),
+    right = currKeyPresses.right, -- love.keyboard.isDown('right'),
+    jump = not ignoreInstantInputs and currKeyPresses.space -- love.keyboard.isDown('space')
   }
 end
 
@@ -132,6 +133,7 @@ end
 
 -- Initializes the game
 function game.load(args)
+  currKeyPresses = {}
   -- Create platforms and game objects from the level data
   platforms = {}
   gems = {}
@@ -314,9 +316,9 @@ end
 -- Renders the game
 function game.draw()
   -- Scale and crop the screen
-  love.graphics.setScissor(0, 0, RENDER_SCALE * GAME_WIDTH, RENDER_SCALE * GAME_HEIGHT)
   love.graphics.scale(RENDER_SCALE, RENDER_SCALE)
-  love.graphics.clear(251 / 255, 134 / 255, 199 / 255)
+  love.graphics.setColor(251 / 255, 134 / 255, 199 / 255)
+  love.graphics.rectangle('fill', 0, 0, GAME_WIDTH, GAME_HEIGHT)
   love.graphics.setColor(1, 1, 1, 1)
 
   -- Draw input latency
@@ -331,9 +333,9 @@ function game.draw()
   end
 
   -- Draw inputs
-  drawSprite2(uiImage, love.keyboard.isDown('left') and 29 or 1, 23, 13, 14, 82, 29)
-  drawSprite2(uiImage, love.keyboard.isDown('right') and 43 or 15, 23, 13, 14, 96, 29)
-  drawSprite2(uiImage, love.keyboard.isDown('space') and 29 or 1, 38, 27, 13, 82, 44)
+  drawSprite2(uiImage, currKeyPresses.left and 29 or 1, 23, 13, 14, 82, 29)
+  drawSprite2(uiImage, currKeyPresses.right and 43 or 15, 23, 13, 14, 96, 29)
+  drawSprite2(uiImage, currKeyPresses.space and 29 or 1, 38, 27, 13, 82, 44)
 
   -- Draw  the platforms
   for _, platform in ipairs(platforms) do
@@ -377,12 +379,17 @@ function game.draw()
 end
 
 function game.keypressed(key)
-  local amt = (love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift')) and 5 or 1
+  currKeyPresses[key] = true
+  local amt = (love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift')) and 1 or 5
   if key == 'up' then
     inputLatency = math.min(inputLatency + amt, 60)
   elseif key == 'down' then
     inputLatency = math.max(-60, inputLatency - amt)
   end
+end
+
+function game.keyreleased(key)
+  currKeyPresses[key] = false
 end
 
 return game

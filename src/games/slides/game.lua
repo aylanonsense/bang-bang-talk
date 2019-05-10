@@ -3,7 +3,7 @@ local game = {}
 -- Render constants
 local GAME_WIDTH = 192
 local GAME_HEIGHT = 125
-local RENDER_SCALE = 4
+local RENDER_SCALE = 2
 
 local spriteSheet
 local currSlideIndex
@@ -32,9 +32,9 @@ end
 
 function game.draw()
   -- Scale and crop the screen
-  love.graphics.setScissor(0, 0, RENDER_SCALE * GAME_WIDTH, RENDER_SCALE * GAME_HEIGHT)
   love.graphics.scale(RENDER_SCALE, RENDER_SCALE)
-  love.graphics.clear(1, 1, 1)
+  love.graphics.setColor(0, 0, 0)
+  love.graphics.rectangle('fill', 0, 0, GAME_WIDTH, GAME_HEIGHT)
   love.graphics.setColor(1, 1, 1)
 
   -- Draw current slide

@@ -3,6 +3,10 @@ local juiceGame = require 'src/games/juice/game'
 local badMathGame = require 'src/games/bad-math/game'
 local inputLatencyGame = require 'src/games/input-latency/game'
 
+local SCALE = 3
+local OFFSET_X = 110
+local OFFSET_Y = 40
+
 local games = {
   { game = slides, args = { slides = { 0 } } },
 
@@ -59,10 +63,17 @@ function love.update(...)
 end
 
 function love.draw(...)
+  love.graphics.translate(OFFSET_X, OFFSET_Y)
+  love.graphics.scale(SCALE, SCALE)
   -- Draw the current game
   if game.draw then
     game.draw(...)
   end
+  love.graphics.setColor(0, 0, 0)
+  love.graphics.rectangle('fill', -4000, -4000, 4000, 8000)
+  love.graphics.rectangle('fill', -4000, -4000, 8000, 4000)
+  love.graphics.rectangle('fill', 192, -4000, 8000, 8000)
+  love.graphics.rectangle('fill', -4000, 125, 8000, 8000)
 end
 
 function love.keypressed(key, ...)
@@ -74,5 +85,11 @@ function love.keypressed(key, ...)
     elseif key == 'r' then
       switchToGame(currGameIndex)
     end
+  end
+end
+
+function love.keyreleased(...)
+  if game.keyreleased then
+    game.keyreleased(...)
   end
 end
