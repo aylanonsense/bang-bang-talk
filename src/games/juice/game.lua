@@ -5,6 +5,7 @@ local GAME_WIDTH = 192
 local GAME_HEIGHT = 125
 local RENDER_SCALE = 2
 
+local sounds
 local isInMenu
 local isHit
 local canSwing
@@ -54,6 +55,11 @@ function game.preload()
   spriteSheet:setFilter('nearest', 'nearest')
   uiImage = love.graphics.newImage('src/games/juice/img/ui.png')
   uiImage:setFilter('nearest', 'nearest')
+  sounds = {
+    poorHit = love.audio.newSource('src/games/juice/sfx/hit-poor.wav', 'static'),
+    goodHit = love.audio.newSource('src/games/juice/sfx/hit-good.wav', 'static'),
+    miss = love.audio.newSource('src/games/juice/sfx/miss.wav', 'static')
+  }
 end
 
 function game.load(args)
@@ -130,6 +136,15 @@ function game.update(dt)
             ball.sprite = useFastBall and 0 or 2
             ball.hit = true
           end
+        end
+        if isHit then
+          if useCrunchySounds then
+            love.audio.play(sounds.goodHit:clone())
+          else
+            love.audio.play(sounds.poorHit:clone())
+          end
+        else
+          love.audio.play(sounds.miss:clone())
         end
       end
       -- Update ball

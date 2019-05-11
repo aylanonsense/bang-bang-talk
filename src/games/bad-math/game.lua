@@ -7,6 +7,7 @@ local GAME_WIDTH = 192
 local GAME_HEIGHT = 125
 local RENDER_SCALE = 2
 
+local sounds
 local pointerCol
 local pointerRow
 local dialogIndex
@@ -31,6 +32,9 @@ function game.preload()
   -- Load assets
   spriteSheet = love.graphics.newImage('src/games/bad-math/img/sprite-sheet.png')
   spriteSheet:setFilter('nearest', 'nearest')
+  sounds = {
+    boop = love.audio.newSource('src/games/bad-math/sfx/boop.wav', 'static')
+  }
 end
 
 function game.load(args)
@@ -146,8 +150,10 @@ end
 function game.keypressed(key)
   if key == 'up' or key == 'down' then
     pointerRow = 1 - pointerRow
+    love.audio.play(sounds.boop:clone())
   elseif key == 'left' or key == 'right' then
     pointerCol = 1 - pointerCol
+    love.audio.play(sounds.boop:clone())
   elseif (key == 'space' or key == 'h') and dialogIndex ~= 2 then
     isHit = (key == 'h')
     dialogIndex = dialogIndex + 1
@@ -155,6 +161,7 @@ function game.keypressed(key)
     pointerCol = 0
     pointerRow = 0
     animationFrames = 0
+    love.audio.play(sounds.boop:clone())
   end
 end
 

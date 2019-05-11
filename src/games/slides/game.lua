@@ -25,9 +25,9 @@ function game.preload()
   spriteSheet:setFilter('nearest', 'nearest')
 end
 
-function game.load(args)
-  currSlideIndex = 1
+function game.load(args, isGoingBack)
   slides = args.slides
+  currSlideIndex = isGoingBack and #slides or 1
 end
 
 function game.draw()
