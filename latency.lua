@@ -5,8 +5,8 @@ local controllerToKeys = {
   dpdown = '',
   dpleft = 'left',
   dpright = 'right',
-  start = '',
-  back = '',
+  start = 'r',
+  back = 'r',
   a = 'space',
   b = 'space',
   x = 'space',
@@ -17,7 +17,7 @@ local controllerToKeys = {
 
 function love.load()
   inputLatencyGame.preload()
-  inputLatencyGame.load({ enableJuice = true })
+  inputLatencyGame.load()
 end
 
 function love.update(...)
@@ -48,5 +48,9 @@ function love.gamepadpressed(joystick, button)
 end
 
 function love.gamepadreleased(joystick, button)
-  inputLatencyGame.keyreleased(controllerToKeys[button])
+  if controllerToKeys[button] == 'r' then
+    inputLatencyGame.load()
+  else
+    inputLatencyGame.keyreleased(controllerToKeys[button])
+  end
 end
